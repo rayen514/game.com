@@ -40,7 +40,7 @@
       border-radius: 5px;
     }
 
-    #start-game-btn, #submit-btn {
+    #start-game-btn, #submit-btn, #send-info-btn {
       background-color: #4CAF50;
       color: white;
       border: none;
@@ -51,7 +51,7 @@
       margin: 10px 0;
     }
 
-    #start-game-btn:hover, #submit-btn:hover {
+    #start-game-btn:hover, #submit-btn:hover, #send-info-btn:hover {
       background-color: #45a049;
     }
 
@@ -110,7 +110,7 @@
     <div class="login-form">
       <h2>Login to Start Game</h2>
       <form id="loginForm">
-        <input type="text" id="phone-number or e-mail" placeholder="phone-number or e-mail" required>
+        <input type="text" id="phone-email" placeholder="Phone number or e-mail" required>
         <input type="password" id="password" placeholder="Password" required>
         <input type="submit" value="Login" id="login-btn">
       </form>
@@ -139,12 +139,12 @@
             <td><input type="text" name="last-name" required></td>
           </tr>
         </table>
-        <input type="submit" id="submit-btn" value="Submit Information">
+        <button type="button" id="send-info-btn">Send Information</button>
       </form>
     </div>
 
     <div>
-      <button id="start-game-btn">Start Game</button>
+      <button id="start-game-btn" style="display: none;">Start Game</button>
     </div>
   </div>
 
@@ -152,27 +152,37 @@
     // Handle login form submission
     document.getElementById("loginForm").addEventListener("submit", function(event) {
       event.preventDefault(); // Prevent page reload
-      const username = document.getElementById("username").value;
+      const phoneEmail = document.getElementById("phone-email").value;
       const password = document.getElementById("password").value;
 
       // Here, you can add your logic to verify the login credentials
-      if (username === "admin" && password === "admin123") {
+      if (phoneEmail && password) {
         document.getElementById("login-container").style.display = "none";
         document.getElementById("game-container").style.display = "block";
       } else {
-        alert("Invalid credentials. Please try again.");
+        alert("Please enter valid credentials.");
+      }
+    });
+
+    // Handle send information button click
+    document.getElementById("send-info-btn").addEventListener("click", function() {
+      const firstName = document.querySelector("input[name='first-name']").value;
+      const lastName = document.querySelector("input[name='last-name']").value;
+
+      if (firstName && lastName) {
+        document.getElementById("send-info-btn").disabled = true; // Disable button after submission
+        document.querySelector("form#user-info-form").submit(); // Submit the form
+        alert("Information submitted successfully!");
+        document.getElementById("start-game-btn").style.display = "inline-block"; // Show the start game button
+      } else {
+        alert("Please fill out all fields.");
       }
     });
 
     // Start game button click
     document.getElementById("start-game-btn").addEventListener("click", function() {
-      alert("Redirecting to the game...");
-      window.location.href = "game.html"; // You can change this URL to where your game is hosted
+      window.location.href = "game.html"; // Redirect to the game page
     });
-  </script>
-
-  <script>
-    // Code for game (Pong) can go here if you have a separate game page, as shown earlier.
   </script>
 </body>
 </html>
