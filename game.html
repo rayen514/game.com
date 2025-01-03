@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pong Game</title>
+  <style>
+    body {
+      background-color: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: white;
+    }
+
+    canvas {
+      border: 2px solid white;
+    }
+
+    #score {
+      position: absolute;
+      top: 20px;
+      font-size: 24px;
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="pong" width="800" height="400"></canvas>
+  <div id="score">Player 1: 0 | Player 2: 0</div>
+
+  <script>
+    const canvas = document.getElementById("pong");
+    const ctx = canvas.getContext("2d");
+
+    // Détails des raquettes
+    const paddleWidth = 10, paddleHeight = 100;
+    let paddle1Y = canvas.height / 2 - paddleHeight / 2;
+    let paddle2Y = canvas.height / 2 - paddleHeight / 2;
+
+    // Détails de la balle
+    const ballSize = 10;
+    let ballX = canvas.width / 2, ballY = canvas.height / 2;
+    let ballSpeedX = 5, ballSpeedY = 5;
+
+    // Scores
+    let player1Score = 0, player2Score = 0;
+
+    // Contrôles des joueurs
+    const upArrow = 38, downArrow = 40; // Flèches pour joueur 2
+    const wKey = 87, sKey = 83; // W/S pour joueur 1
+
+    // Fonction pour dessiner les raquettes
+    function drawPaddle(x, y) {
+      ctx.fillStyle = "#FFF";
+      ctx.fillRect(x, y, paddleWidth, paddleHeight);
+    }
+
+    // Fonction pour dessiner la balle
+    function drawBall() {
+      ctx.fillStyle = "#FFF";
+      ctx.beginPath();
+      ctx.arc(ballX, ballY, ballSize, 0, Math.PI * 2, false);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Fonction pour dessiner le score
+    function drawScore() {
+      document.getElementById("score").textContent = `Player 1: ${player1Score} | Player 2: ${player2Score}`;
+    }
+
+    // Détecter les collisions avec les raquettes
+    function ballCollision() {
+      // Collision avec la raquette de joueur 1
+      if (ballX - ballSize <= paddleWidth && ballY >= paddle1Y && ballY <= paddle1Y + paddleHeight) {
+        ballSpeedX = -ballSpeedX;
+      }
+
+      // Collision avec la raquette de joueur 2
+      if (ballX + ballSize >= canvas.width - paddleWidth && ballY >= paddle2Y && ballY <= paddle2Y + paddleHeight) {
+        ballSpeedX = -ballSpeedX;
+      }
+    }
+
+    // Détecter si la balle touche le haut ou le bas
+    function ballWallCollision() {
+      if (ballY - ballSize <= 0 || ballY + ballSize >= canvas.height) {
+        ballSpeedY = -ballSpeedY;
+      }
+    }
+
+    // Détecter si un joueur marque un point
+    function checkScore() {
+      if (ballX - ballSize <= 0) {
+        player2Score++;
+        resetBall();
+      }
+      if (ballX + ballSize >= canvas.width) {
+        player1Score++;
+        resetBall();
+      }
+    }
+
+    // Réinitialiser la balle
+    function resetBall() {
+      ballX = canvas.width / 2;
+      ballY = canvas.height / 2;
+      ballSpeedX = -ballSpeedX;
+      ballSpeedY = (Math.random() * 2 - 1) * 5;
+    }
+
+    // Fonction pour déplacer les raquettes
+    function movePaddles() {
+      if (wKeyPressed && paddle1Y > 0) paddle1Y -= 10;
+      if (sKeyPressed && paddle1Y + paddleHeight < canvas.height) paddle1Y += 10;
+      if (upArrowPressed && paddle2Y > 0) paddle2Y -= 10;
+      if (downArrowPressed && paddle2Y + paddleHeight < canvas.height) paddle2Y += 10;
+    }
+
+    // Variables pour vérifier les touches pressées
+    let wKeyPressed = false, sKeyPressed = false;
+    let upArrowPressed = false, downArrowPressed = false;
+
+    // Événements de pression des touches
+    document.addEventListener("keydown", (e) => {
+      if (e.keyCode === wKey) wKeyPressed = true;
+      if (e.keyCode === sKey) sKeyPressed = true;
+      if (e.keyCode === upArrow) upArrowPressed = true;
+      if (e.keyCode === downArrow) downArrowPressed = true;
+    });
+
+    document.addEventListener("keyup", (e) => {
+      if (e.keyCode === wKey) wKeyPressed = false;
+      if (e.keyCode === sKey) sKeyPressed = false;
+      if (e.keyCode === upArrow) upArrowPressed = false;
+      if (e.keyCode === downArrow) downArrowPressed = false;
+    });
+
+    // Fonction de mise à jour du jeu
+    function update() {
+      movePaddles();
+      ballCollision();
+      ballWallCollision();
+      checkScore();
+
+      ballX += ballSpeedX;
+      ballY += ballSpeedY;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Effacer l'écran
+
+      // Dessiner le jeu
+      drawPaddle(0, paddle1Y); // Raquette joueur 1
+      drawPaddle(canvas.width - paddleWidth, paddle2Y); // Raquette joueur 2
+      drawBall();
+      drawScore();
+    }
+
+    // Boucle de jeu
+    setInterval(update, 1000 / 60); // Mettre à jour le jeu 60 fois par seconde
+  </script>
+</body>
+</html>
